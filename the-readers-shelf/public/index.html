@@ -136,6 +136,162 @@
     });
   </script>
     <noscript>You need to enable JavaScript to run this app.</noscript>
+
+
+    <!-- Book Details Section -->
+<div id="bookDetails"></div>
+
+<!-- User Rating Form -->
+<h2>Rate This Book</h2>
+<form id="ratingForm">
+  <label for="rating">Your Rating (1-5):</label>
+  <input type="number" id="rating" name="rating" min="1" max="5" required>
+
+  <button type="submit">Submit Rating</button>
+</form>
+
+<!-- ... (Previous code) -->
+
+<script>
+  // ... (Previous code)
+
+  // Fetch book details and display them in the bookDetails div
+  function displayBookDetails(book) {
+    const bookDetailsDiv = document.getElementById('bookDetails');
+    bookDetailsDiv.innerHTML = `<h2>${book.title}</h2>
+                                 <p><strong>Author:</strong> ${book.author}</p>
+                                 <p><strong>Description:</strong> ${book.description}</p>
+                                 <p><strong>Average Rating:</strong> ${book.avgRating.toFixed(2)}</p>`;
+  }
+
+  // Handle form submission for user rating
+  document.getElementById('ratingForm').addEventListener('submit', async (event) => {
+    event.preventDefault();
+
+    const formData = new FormData(event.target);
+    const rating = formData.get('rating');
+
+    try {
+      const response = await fetch('/rateBook', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          bookId: selectedBookId, // Assuming you have the book's ID from somewhere
+          rating: parseInt(rating),
+        }),
+      });
+
+      if (response.ok) {
+        const updatedBook = await response.json();
+        displayBookDetails(updatedBook); // Update the book details with the new average rating
+      } else {
+        const data = await response.json();
+        alert(data.error || 'Error submitting rating');
+      }
+    } catch (error) {
+      console.error('Error submitting rating', error);
+    }
+  });
+</script>
+
+
+<!-- Display Other Users' Book Recommendations -->
+<h2>Other Users' Book Recommendations</h2>
+<div id="otherUsersRecommendations"></div>
+
+<!-- User Interaction Options -->
+<div id="userInteractionOptions">
+  <h2>Interaction Options</h2>
+  <button id="likeButton">Like</button>
+  <button id="commentButton">Comment</button>
+  <button id="followButton">Follow</button>
+</div>
+
+<!-- Personalized Recommendations Feed -->
+<h2>Personalized Recommendations Feed</h2>
+<div id="personalizedRecommendationsFeed"></div>
+
+
+<script>
+  
+
+  // Function to display other users' book recommendations
+  function displayOtherUsersRecommendations(recommendations) {
+    const otherUsersRecommendationsDiv = document.getElementById('otherUsersRecommendations');
+    otherUsersRecommendationsDiv.innerHTML = '';
+
+    recommendations.forEach((recommendation) => {
+      const recommendationDiv = document.createElement('div');
+      recommendationDiv.innerHTML = `<h3>${recommendation.title}</h3>
+                                      <p><strong>Author:</strong> ${recommendation.author}</p>
+                                      <p><strong>Description:</strong> ${recommendation.description}</p>
+                                      <p><strong>Rating:</strong> ${recommendation.rating}</p>
+                                      <p><strong>Posted By:</strong> ${recommendation.username}</p>`;
+      otherUsersRecommendationsDiv.appendChild(recommendationDiv);
+    });
+  }
+
+  // Function to display personalized recommendations feed
+  function displayPersonalizedRecommendations(recommendations) {
+    const personalizedRecommendationsFeedDiv = document.getElementById('personalizedRecommendationsFeed');
+    personalizedRecommendationsFeedDiv.innerHTML = '';
+
+    recommendations.forEach((recommendation) => {
+      const recommendationDiv = document.createElement('div');
+      recommendationDiv.innerHTML = `<h3>${recommendation.title}</h3>
+                                      <p><strong>Author:</strong> ${recommendation.author}</p>
+                                      <p><strong>Description:</strong> ${recommendation.description}</p>
+                                      <p><strong>Rating:</strong> ${recommendation.rating}</p>
+                                      <p><strong>Recommended By:</strong> ${recommendation.username}</p>`;
+      personalizedRecommendationsFeedDiv.appendChild(recommendationDiv);
+    });
+  }
+
+
+   // Handle user interactions
+   document.getElementById('likeButton').addEventListener('click', async () => {
+    // Make an API request to like the selected book recommendation
+    try {
+      const response = await fetch('/like', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          bookId: selectedBookId, // Assuming you have the book's ID from somewhere
+        }),
+      });
+
+      if (response.ok) {
+        alert('Book recommendation liked!');
+      } else {
+        const data = await response.json();
+        alert(data.error || 'Error liking book recommendation');
+      }
+    } catch (error) {
+      console.error('Error liking book recommendation', error);
+    }
+  });
+
+  // Handle user interactions
+  document.getElementById('commentButton').addEventListener('click', async () => {
+    // Implement the logic for handling comments (POST request to add comments)
+    // You'll need a textarea or input field to allow users to enter comments.
+    // Similar to the 'like' button, send the bookId and comment text in the request body.
+  });
+
+  // Handle user interactions
+  document.getElementById('followButton').addEventListener('click', async () => {
+    // Implement the logic for handling follow (POST request to follow other users)
+    // You'll need to get the userID or username of the user being followed and send it in the request body.
+  });
+
+  
+</script>
+
+
     <div id="root"></div>
     <!--
       This HTML file is a template.
